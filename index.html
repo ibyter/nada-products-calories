@@ -110,16 +110,13 @@
     .filter-scroll-wrap::-webkit-scrollbar { display: none; }
     .filter-scroll { display: flex; gap: 6px; width: max-content; padding-bottom: 2px; }
 
-    /* Second row: calorie + sort */
+    /* Second row: calorie range label + scrollable pills */
     .filter-row2 {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      margin-bottom: 10px;
     }
-    .filter-row2::-webkit-scrollbar { display: none; }
     .filter-section-label {
       font-size: 11.5px;
       font-weight: 600;
@@ -129,6 +126,14 @@
       white-space: nowrap;
       flex-shrink: 0;
     }
+    .cal-scroll-wrap {
+      flex: 1;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .cal-scroll-wrap::-webkit-scrollbar { display: none; }
+    .cal-scroll { display: flex; gap: 6px; width: max-content; padding-bottom: 2px; }
 
     .pill {
       padding: 6px 14px;
@@ -149,7 +154,7 @@
     .pill.active { background: var(--green); border-color: var(--green); color: #fff; font-weight: 600; }
 
     .sort-select {
-      padding: 7px 14px;
+      padding: 7px 12px;
       border-radius: var(--radius);
       border: 1.5px solid var(--border);
       background: var(--surface);
@@ -159,8 +164,8 @@
       cursor: pointer;
       outline: none;
       transition: border-color .15s;
-      margin-right: auto;
       flex-shrink: 0;
+      max-width: 180px;
     }
     .sort-select:focus { border-color: var(--green); }
 
@@ -168,6 +173,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       padding: 8px 0 14px;
       font-size: 13px;
       color: var(--muted);
@@ -406,21 +412,24 @@
 
   <div class="filter-row2">
     <span class="filter-section-label">سعرات</span>
-    <button class="pill active" data-cal="all">الكل</button>
-    <button class="pill" data-cal="low">أقل من 70</button>
-    <button class="pill" data-cal="mid">70 – 120</button>
-    <button class="pill" data-cal="high">أكثر من 120</button>
+    <div class="cal-scroll-wrap">
+      <div class="cal-scroll">
+        <button class="pill active" data-cal="all">الكل</button>
+        <button class="pill" data-cal="low">أقل من 70</button>
+        <button class="pill" data-cal="mid">70 – 120</button>
+        <button class="pill" data-cal="high">أكثر من 120</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <span>عرض <strong id="results-count">96</strong> منتج</span>
     <select class="sort-select" id="sort-select" aria-label="ترتيب حسب">
       <option value="cal-desc">الأعلى سعرات أولاً</option>
       <option value="cal-asc">الأقل سعرات أولاً</option>
       <option value="prot-desc">الأعلى بروتين أولاً</option>
       <option value="name">الاسم أ–ي</option>
     </select>
-  </div>
-
-  <div class="results-bar">
-    <span>عرض <strong id="results-count">96</strong> منتج</span>
-    <span id="active-filter-label" style="color:var(--green);font-weight:600"></span>
   </div>
 </section>
 
