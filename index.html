@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سعرات ندى الحرارية</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:      #00833D;
+      --green-dark: #005C2B;
+      --green-mid:  #00A34C;
+      --green-pale: #E6F4ED;
+      --green-chip: #C8E9D7;
+      --amber:      #D97706;
+      --amber-pale: #FEF3C7;
+      --red:        #DC2626;
+      --red-pale:   #FEE2E2;
+      --bg:         #F4F8F6;
+      --surface:    #FFFFFF;
+      --border:     #D6E8DC;
+      --text:       #142B1E;
+      --muted:      #5A7A68;
+      --radius:     12px;
+      --shadow:     0 1px 3px rgba(0,80,40,.07), 0 4px 12px rgba(0,80,40,.05);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--green);
+      color: #fff;
+      padding: 28px 24px 24px;
+      text-align: center;
+    }
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .header-logo svg { flex-shrink: 0; }
+    .header h1 {
+      font-size: clamp(22px, 5vw, 32px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,.75);
+      margin-top: 4px;
+    }
+    .header-stats {
+      display: inline-flex;
+      gap: 24px;
+      margin-top: 16px;
+      background: rgba(255,255,255,.12);
+      border-radius: 40px;
+      padding: 8px 20px;
+      font-size: 13px;
+    }
+    .header-stats span { color: rgba(255,255,255,.9); }
+    .header-stats strong { color: #fff; font-weight: 700; }
+
+    /* ── Controls ── */
+    .controls {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 20px 0;
+    }
+
+    .search-bar {
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 11px 16px 11px 44px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .18s;
+      direction: rtl;
+    }
+    .search-bar input:focus { border-color: var(--green); }
+    .search-bar input::placeholder { color: var(--muted); }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+
+    .pill {
+      padding: 6px 14px;
+      border-radius: 40px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .pill:hover { border-color: var(--green); color: var(--green); }
+    .pill.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .sort-select {
+      padding: 7px 14px;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      outline: none;
+      transition: border-color .15s;
+      margin-right: auto;
+    }
+    .sort-select:focus { border-color: var(--green); }
+
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .results-bar strong { color: var(--text); font-weight: 600; }
+
+    /* ── Grid ── */
+    .grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,80,40,.10), 0 1px 4px rgba(0,80,40,.06);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .card-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.45;
+      flex: 1;
+    }
+    .card-name a {
+      color: inherit;
+      text-decoration: none;
+      transition: color .15s;
+    }
+    .card-name a:hover { color: var(--green); }
+
+    .cat-badge {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* Category color coding */
+    .cat-labneh       { background: #E0F0EA; color: #175E35; }
+    .cat-greek-yogurt { background: #D6EAF8; color: #1A4E7A; }
+    .cat-drinking-yogurt { background: #D5EEF9; color: #1B5778; }
+    .cat-yogurt       { background: #E3F2FD; color: #1565C0; }
+    .cat-legumes      { background: #FFF3CD; color: #7D5A00; }
+    .cat-juice        { background: #FDE8D8; color: #7A2D0B; }
+    .cat-milk         { background: #F3E8FF; color: #5B21B6; }
+    .cat-protein-milk { background: #FCE7F3; color: #831843; }
+    .cat-plant-based  { background: #ECFDF5; color: #064E3B; }
+    .cat-other        { background: #F1F5F9; color: #475569; }
+
+    /* ── Calorie bar ── */
+    .cal-section { display: flex; flex-direction: column; gap: 6px; }
+
+    .cal-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .cal-label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+    .cal-value {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .cal-value.high  { color: var(--red); }
+    .cal-value.mid   { color: var(--amber); }
+    .cal-value.low   { color: var(--green); }
+    .cal-value.none  { font-size: 14px; color: var(--muted); }
+    .cal-unit { font-size: 12px; font-weight: 500; color: var(--muted); }
+
+    .bar-track {
+      height: 6px;
+      background: var(--bg);
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .4s cubic-bezier(.4,0,.2,1);
+    }
+    .bar-fill.high  { background: linear-gradient(90deg, var(--amber), var(--red)); }
+    .bar-fill.mid   { background: linear-gradient(90deg, var(--green-mid), var(--amber)); }
+    .bar-fill.low   { background: var(--green); }
+
+    /* ── Meta row ── */
+    .meta-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--green-pale);
+      padding-top: 10px;
+    }
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--bg);
+      border-radius: 20px;
+      padding: 4px 10px;
+    }
+    .meta-chip strong { color: var(--text); font-weight: 600; }
+    .meta-chip svg { flex-shrink: 0; }
+
+    /* ── Empty state ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 64px 20px;
+      color: var(--muted);
+    }
+    .empty svg { display: block; margin: 0 auto 16px; opacity: .35; }
+    .empty h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .empty p { font-size: 14px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 16px 20px 32px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    footer a { color: var(--green); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+      .header { padding: 22px 16px 18px; }
+      .header-stats { gap: 16px; font-size: 12px; }
+      .controls { padding: 14px 14px 0; }
+      .grid { padding: 0 14px 40px; gap: 10px; }
+      .sort-select { margin-right: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-logo">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+      <rect width="36" height="36" rx="10" fill="rgba(255,255,255,.15)"/>
+      <path d="M10 26V14l8-4 8 4v12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 26v-7h8v7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h1>سعرات منتجات ندى</h1>
+  </div>
+  <p>السعرات الحرارية والبروتين لكل منتج — مرتبة ومصفاة</p>
+  <div class="header-stats">
+    <span><strong id="stat-total">96</strong> منتج</span>
+    <span><strong id="stat-max">213</strong> أعلى سعر</span>
+    <span><strong id="stat-min">29</strong> أقل سعر</span>
+  </div>
+</header>
+
+<!-- Controls -->
+<section class="controls">
+  <div class="search-bar">
+    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+    </svg>
+    <input type="search" id="search-input" placeholder="ابحث باسم المنتج..." autocomplete="off" />
+  </div>
+
+  <div class="filter-row">
+    <span class="filter-label">الفئة</span>
+    <button class="pill active" data-cat="all">الكل</button>
+    <button class="pill" data-cat="labneh">لبنة وقشطة</button>
+    <button class="pill" data-cat="greek-yogurt">زبادي يوناني</button>
+    <button class="pill" data-cat="drinking-yogurt">شراب زبادي</button>
+    <button class="pill" data-cat="yogurt">زبادي طازج</button>
+    <button class="pill" data-cat="legumes">بقوليات</button>
+    <button class="pill" data-cat="juice">عصائر</button>
+    <button class="pill" data-cat="milk">حليب ولبن</button>
+    <button class="pill" data-cat="protein-milk">بروتين وباور ميلك</button>
+    <button class="pill" data-cat="plant-based">نباتية</button>
+  </div>
+
+  <div class="filter-row">
+    <span class="filter-label">السعرات</span>
+    <button class="pill active" data-cal="all">الكل</button>
+    <button class="pill" data-cal="low">أقل من 70</button>
+    <button class="pill" data-cal="mid">70 – 120</button>
+    <button class="pill" data-cal="high">أكثر من 120</button>
+    <select class="sort-select" id="sort-select" aria-label="ترتيب حسب">
+      <option value="cal-desc">الأعلى سعرات أولاً</option>
+      <option value="cal-asc">الأقل سعرات أولاً</option>
+      <option value="prot-desc">الأعلى بروتين أولاً</option>
+      <option value="name">الاسم أ–ي</option>
+    </select>
+  </div>
+
+  <div class="results-bar">
+    <span>عرض <strong id="results-count">96</strong> منتج</span>
+    <span id="active-filter-label" style="color:var(--green);font-weight:600"></span>
+  </div>
+</section>
+
+<!-- Grid -->
+<main class="grid" id="grid" aria-live="polite"></main>
+
+<footer>
+  مصدر البيانات: <a href="https://nada.com.sa/en/products/" target="_blank" rel="noopener">صفحات منتجات ندى</a> — السعرات الحرارية والبروتين من ألواح التغذية على صفحات تفاصيل المنتجات
+</footer>
+
+<script>
+  const CAT_LABELS = {
+    'labneh':         'لبنة وقشطة',
+    'greek-yogurt':   'زبادي يوناني',
+    'drinking-yogurt':'شراب زبادي',
+    'yogurt':         'زبادي طازج',
+    'legumes':        'بقوليات',
+    'juice':          'عصائر',
+    'milk':           'حليب ولبن',
+    'protein-milk':   'بروتين وباور ميلك',
+    'plant-based':    'نباتية',
+    'other':          'أخرى',
+  };
+
+  const products = [
+    { id:1,  name:'قشطة طازجة', url:'https://nada.com.sa/en/product/fresh-cream/', serving:'100 مل', cal:213, prot:2.2, protStr:'2.2 جم', cat:'labneh' },
+    { id:2,  name:'لبنة تركية', url:'https://nada.com.sa/en/product/turkish-labneh/', serving:'100 جم', cal:209, prot:6.0, protStr:'6.0 جم', cat:'labneh' },
+    { id:3,  name:'قشطة رائبة', url:'https://nada.com.sa/en/product/sour-cream/', serving:'100 مل', cal:203, prot:2.2, protStr:'2.2 جم', cat:'labneh' },
+    { id:4,  name:'لبنة يونانية', url:'https://nada.com.sa/en/product/greek-labneh/', serving:'100 جم', cal:178, prot:8.0, protStr:'8.0 جم', cat:'labneh' },
+    { id:5,  name:'فول مدمس ممتاز – الخلطة المصرية', url:'https://nada.com.sa/en/product/canned-fava-beans-egyptian-recipe/', serving:'½ كوب / 130 جم', cal:164, prot:8.0, protStr:'8 جم', cat:'legumes' },
+    { id:6,  name:'فول مدمس ممتاز – مقشور بالفلفل الحار', url:'https://nada.com.sa/en/product/canned-fava-beans-chili/', serving:'½ كوب / 130 جم', cal:153, prot:5.6, protStr:'5.6 جم', cat:'legumes' },
+    { id:7,  name:'زبادي يوناني توت أسود وتوت العليق', url:'https://nada.com.sa/en/product/greek-yoghurt-berry/', serving:'100 جم', cal:151, prot:7.0, protStr:'7.0 جم', cat:'greek-yogurt' },
+    { id:8,  name:'فول مدمس ممتاز – خلطة الكشنة السعودية', url:'https://nada.com.sa/en/product/canned-fava-beans-saudi-koshna/', serving:'½ كوب / 130 جم', cal:150, prot:7.0, protStr:'7 جم', cat:'legumes' },
+    { id:9,  name:'زبادي يوناني باشن فروت', url:'https://nada.com.sa/en/product/greek-yoghurt-passion-fruit/', serving:'100 جم', cal:143, prot:7.0, protStr:'7.0 جم', cat:'greek-yogurt' },
+    { id:10, name:'زبادي يوناني مع العسل الطبيعي', url:'https://nada.com.sa/en/product/greek-yoghurt-natural-honey/', serving:'100 جم', cal:141, prot:7.0, protStr:'7.0 جم', cat:'greek-yogurt' },
+    { id:11, name:'فول مدمس بالخلطة السرية', url:'https://nada.com.sa/en/product/canned-fava-beans-secret-recipe/', serving:'½ كوب / 130 جم', cal:135, prot:5.92, protStr:'5.92 جم', cat:'legumes' },
+    { id:12, name:'شراب عصير المانجو مع الفاكهة المشكلة بدون سكر مضاف', url:'https://nada.com.sa/en/product/mango-mixed-fruits-drink-juice/', serving:'200 مل', cal:122, prot:0.40, protStr:'0.40 جم', cat:'juice' },
+    { id:13, name:'عصير الشمندر مع التوت الأحمر بدون إضافة سكر', url:'https://nada.com.sa/en/product/beetroot-raspberry-juice/', serving:'100 مل', cal:122, prot:0.52, protStr:'0.52 جم', cat:'juice' },
+    { id:14, name:'عصير الشمندر مع الكشمش الأسود بدون إضافة سكر', url:'https://nada.com.sa/en/product/beetroot-blackcurrant-juice/', serving:'100 مل', cal:121, prot:0.45, protStr:'0.45 جم', cat:'juice' },
+    { id:15, name:'عصير التفاح مع اللب بدون إضافة سكر', url:'https://nada.com.sa/en/product/apple-juice-with-pulp/', serving:'200 مل', cal:116, prot:0.20, protStr:'0.20 جم', cat:'juice' },
+    { id:16, name:'نكتار الفواكه المشكلة بدون سكر', url:'https://nada.com.sa/en/product/mixed-fruits-drink-juice/', serving:'200 مل', cal:115, prot:0.40, protStr:'0.40 جم', cat:'juice' },
+    { id:17, name:'زبادي يوناني سادة', url:'https://nada.com.sa/en/product/greek-yoghurt-plain/', serving:'100 جم', cal:111, prot:7.0, protStr:'7.0 جم', cat:'greek-yogurt' },
+    { id:18, name:'زبادي يوناني 0% دسم مانجو وخوخ', url:'https://nada.com.sa/en/product/greek-yoghurt-0-fat-mango-peach/', serving:'100 جم', cal:111, prot:10.0, protStr:'10.0 جم', cat:'greek-yogurt' },
+    { id:19, name:'شراب زبادي يوناني توت أسود وتوت العليق', url:'https://nada.com.sa/en/product/drinking-greek-yoghurt-berry/', serving:'100 مل', cal:108, prot:8.2, protStr:'8.2 جم', cat:'drinking-yogurt' },
+    { id:20, name:'نكتار الليمون بالنعناع والفواكه المشكلة بدون سكر', url:'https://nada.com.sa/en/product/lemon-mint-drink-juice/', serving:'200 مل', cal:108, prot:0.20, protStr:'0.20 جم', cat:'juice' },
+    { id:21, name:'عصير الأناناس بدون سكر مضاف', url:'https://nada.com.sa/en/product/pineapple-juice-no-sugar-added/', serving:'100 مل', cal:108, prot:0.60, protStr:'0.60 جم', cat:'juice' },
+    { id:22, name:'فاصوليا مطبوخة في صلصة طماطم', url:'https://nada.com.sa/en/product/canned-baked-beans-tomato-sauce/', serving:'½ كوب / 130 جم', cal:108, prot:4.85, protStr:'4.85 جم', cat:'legumes' },
+    { id:23, name:'عصير التفاح بدون سكر مضاف', url:'https://nada.com.sa/en/product/apple-juice-no-sugar/', serving:'100 مل', cal:106, prot:0.20, protStr:'0.20 جم', cat:'juice' },
+    { id:24, name:'نكتار توت والفواكه المشكلة بدون سكر', url:'https://nada.com.sa/en/product/raspberry-drink-juice/', serving:'200 مل', cal:106, prot:0.23, protStr:'0.23 جم', cat:'juice' },
+    { id:25, name:'بازلاء خضراء', url:'https://nada.com.sa/en/product/canned-green-peas/', serving:'—', cal:106, prot:6.0, protStr:'6 جم', cat:'legumes' },
+    { id:26, name:'شراب عصير المانجو مع العنب بدون سكر مضاف', url:'https://nada.com.sa/en/product/mango-grape-drink-juice/', serving:'200 مل', cal:104, prot:0.40, protStr:'0.40 جم', cat:'juice' },
+    { id:27, name:'عصير البرتقال مع العنب بدون سكر مضاف', url:'https://nada.com.sa/en/product/orange-grape-juice/', serving:'200 مل', cal:103, prot:1.20, protStr:'1.20 جم', cat:'juice' },
+    { id:28, name:'نكتار رمان والفواكه المشكلة بدون سكر', url:'https://nada.com.sa/en/product/pomegranate-drink-juice/', serving:'200 مل', cal:103, prot:0.40, protStr:'0.40 جم', cat:'juice' },
+    { id:29, name:'زبادي يوناني قليل الدسم بنكهة التوت الأزرق', url:'https://nada.com.sa/en/product/greek-yoghurt-low-fat-blueberry/', serving:'100 جم', cal:102, prot:7.0, protStr:'7.0 جم', cat:'greek-yogurt' },
+    { id:30, name:'شراب زبادي يوناني فاكهة الباشن مع بذور الشيا', url:'https://nada.com.sa/en/product/drinking-greek-yoghurt-passion-chia/', serving:'100 مل', cal:101, prot:8.2, protStr:'8.2 جم', cat:'drinking-yogurt' },
+    { id:31, name:'عصير البرتقال والجزر مع الفاكهة المشكلة بدون سكر مضاف', url:'https://nada.com.sa/en/product/orange-carrot-mixed-juice/', serving:'100 مل', cal:101, prot:0.20, protStr:'0.20 جم', cat:'juice' },
+    { id:32, name:'زبادي يوناني 0% دسم بنكهة التوت المشكل', url:'https://nada.com.sa/en/product/greek-yoghurt-0-fat-mixed-berry/', serving:'100 جم', cal:100, prot:10.0, protStr:'10.0 جم', cat:'greek-yogurt' },
+    { id:33, name:'نكتار كيوي بالليمون والفواكه المشكلة بدون سكر', url:'https://nada.com.sa/en/product/kiwi-lime-drink-juice/', serving:'100 مل', cal:99, prot:0.20, protStr:'0.20 جم', cat:'juice' },
+    { id:34, name:'زبادي يوناني قليل الدسم بنكهة الفراولة', url:'https://nada.com.sa/en/product/greek-yoghurt-low-fat-strawberry/', serving:'100 جم', cal:98, prot:6.0, protStr:'6.0 جم', cat:'greek-yogurt' },
+    { id:35, name:'شراب زبادي يوناني توت أسود وتوت العليق 0% دسم', url:'https://nada.com.sa/en/product/drinking-greek-yoghurt-blackberry-raspberry-0-fat/', serving:'100 مل', cal:97, prot:8.2, protStr:'8.20 جم', cat:'drinking-yogurt' },
+    { id:36, name:'فاصوليا حمراء', url:'https://nada.com.sa/en/product/canned-red-kidney-beans/', serving:'—', cal:96, prot:7.0, protStr:'7 جم', cat:'legumes' },
+    { id:37, name:'عصير البرتقال بدون سكر مضاف', url:'https://nada.com.sa/en/product/orange-juice-no-sugar/', serving:'100 مل', cal:95, prot:1.20, protStr:'1.20 جم', cat:'juice' },
+    { id:38, name:'شراب زبادي يوناني بنكهة المانجو', url:'https://nada.com.sa/en/product/drinking-greek-yoghurt-mango/', serving:'100 مل', cal:94, prot:8.2, protStr:'8.2 جم', cat:'drinking-yogurt' },
+    { id:39, name:'شراب زبادي يوناني فراولة بالحبوب المشكلة', url:'https://nada.com.sa/en/product/drinking-greek-yoghurt-strawberry-cereal/', serving:'100 مل', cal:94, prot:8.2, protStr:'8.2 جم', cat:'drinking-yogurt' },
+    { id:40, name:'نكتار جوافة والفواكه المشكلة بدون سكر', url:'https://nada.com.sa/en/product/guava-juice/', serving:'200 مل', cal:93, prot:0.40, protStr:'0.40 جم', cat:'juice' },
+    { id:41, name:'زبادي يوناني قليل الدسم فواكه حمراء مع بذور الشيا', url:'https://nada.com.sa/en/product/greek-yoghurt-red-fruits-chia/', serving:'100 جم', cal:90, prot:7.0, protStr:'7.0 جم', cat:'greek-yogurt' },
+    { id:42, name:'قهوة باور ميلك 425 مل', url:'https://nada.com.sa/en/product/power-milk-425ml-coffee/', serving:'100 مل', cal:87, prot:9.5, protStr:'9.5 جم', cat:'protein-milk' },
+    { id:43, name:'باور ميلك شوكولاتة', url:'https://nada.com.sa/en/product/power-milk-chocolate/', serving:'100 مل', cal:87, prot:9.5, protStr:'9.5 جم', cat:'protein-milk' },
+    { id:44, name:'باور ميلك الفانيلا', url:'https://nada.com.sa/en/product/power-milk-vanilla-mixed-fruit/', serving:'100 مل', cal:87, prot:9.5, protStr:'9.5 جم', cat:'protein-milk' },
+    { id:45, name:'حليب بروتين 320 مل بنكهة القهوة', url:'https://nada.com.sa/en/product/protein-milk-320ml-coffee/', serving:'100 مل', cal:87, prot:9.5, protStr:'9.5 جم', cat:'protein-milk' },
+    { id:46, name:'حليب بنكهة الشوكولاتة للصغار بسمة', url:'https://nada.com.sa/en/product/junior-chocolate-milk-girls/', serving:'100 مل', cal:87, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:47, name:'حليب بنكهة الشوكولاتة للصغار دحومي', url:'https://nada.com.sa/en/product/junior-chocolate-milk-boys/', serving:'100 مل', cal:87, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:48, name:'حليب بنكهة الفراولة للصغار بسمة', url:'https://nada.com.sa/en/product/junior-strawberry-milk-girls/', serving:'100 مل', cal:85, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:49, name:'حليب بنكهة الفراولة للصغار دحومي', url:'https://nada.com.sa/en/product/junior-strawberry-milk-boys/', serving:'100 مل', cal:85, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:50, name:'فول مدمس سادة', url:'https://nada.com.sa/en/product/canned-fava-beans-plain-medammes/', serving:'½ كوب / 130 جم', cal:85, prot:6.39, protStr:'6.39 جم', cat:'legumes' },
+    { id:51, name:'باور ميلك الفراولة', url:'https://nada.com.sa/en/product/power-milk-strawberry-with-mixed-fruit/', serving:'100 مل', cal:77, prot:9.5, protStr:'9.5 جم', cat:'protein-milk' },
+    { id:52, name:'حمص مسلوق', url:'https://nada.com.sa/en/product/canned-cooked-chickpeas/', serving:'½ كوب / 130 جم', cal:70, prot:12.09, protStr:'12.09 جم', cat:'legumes' },
+    { id:53, name:'بروتين لبن كامل الدسم', url:'https://nada.com.sa/en/product/protein-laban-full-fat/', serving:'100 مل', cal:70, prot:5.6, protStr:'5.6 جم', cat:'protein-milk' },
+    { id:54, name:'عصير عنب وتوت عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-grape-berries-floridas-natural-juice/', serving:'100 مل', cal:69, prot:0.2, protStr:'0.2 جم', cat:'juice' },
+    { id:55, name:'شراب زبادي يوناني سادة 0% دسم', url:'https://nada.com.sa/en/product/drinking-greek-yoghurt-plain-0-fat/', serving:'100 مل', cal:68, prot:9.1, protStr:'9.1 جم', cat:'drinking-yogurt' },
+    { id:56, name:'شراب زبادي يوناني سادة', url:'https://nada.com.sa/en/product/drinking-greek-yoghurt-plain/', serving:'100 مل', cal:68, prot:9.1, protStr:'9.1 جم', cat:'drinking-yogurt' },
+    { id:57, name:'عصير رمان عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-pomegranate-floridas-natural-juice/', serving:'100 مل', cal:67, prot:0.0, protStr:'0.0 جم', cat:'juice' },
+    { id:58, name:'زبادي يوناني قليل الدسم سادة', url:'https://nada.com.sa/en/product/greek-yoghurt-low-fat-plain/', serving:'100 جم', cal:66, prot:7.0, protStr:'7.0 جم', cat:'greek-yogurt' },
+    { id:59, name:'زبادي يوناني 0% دسم سادة', url:'https://nada.com.sa/en/product/greek-yoghurt-0-fat-plain/', serving:'100 جم', cal:63, prot:10.0, protStr:'10.0 جم', cat:'greek-yogurt' },
+    { id:60, name:'زبادي طازج كامل الدسم', url:'https://nada.com.sa/en/product/fresh-yoghurt-full-cream/', serving:'100 مل', cal:62, prot:3.1, protStr:'3.1 جم', cat:'yogurt' },
+    { id:61, name:'مشروب الشوفان العضوي باريستا', url:'https://nada.com.sa/en/product/organic-oat-barista-drink/', serving:'100 مل', cal:61, prot:1.0, protStr:'1.0 جم', cat:'plant-based' },
+    { id:62, name:'حليب طازج كامل الدسم', url:'https://nada.com.sa/en/product/fresh-milk-full-cream/', serving:'100 مل', cal:60, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:63, name:'لبن طازج كامل الدسم', url:'https://nada.com.sa/en/product/fresh-laban-full-cream/', serving:'100 مل', cal:60, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:64, name:'حليب كامل الدسم للصغار بسمة', url:'https://nada.com.sa/en/product/junior-milk-full-cream-girls/', serving:'100 مل', cal:60, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:65, name:'حليب كامل الدسم للصغار دحومي', url:'https://nada.com.sa/en/product/junior-milk-full-cream-boys/', serving:'100 مل', cal:60, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:66, name:'حليب البروتين السادة', url:'https://nada.com.sa/en/product/protein-plain-milk/', serving:'100 مل', cal:60, prot:8.5, protStr:'8.5 جم', cat:'protein-milk' },
+    { id:67, name:'حليب بروتين بنكهة مانجو ألفونسو مع الفواكه المشكلة', url:'https://nada.com.sa/en/product/protein-alphonso-mango-mixed/', serving:'100 مل', cal:60, prot:null, protStr:'غير محدد', cat:'protein-milk' },
+    { id:68, name:'حليب بروتين بالشوكولاتة', url:'https://nada.com.sa/en/product/protein-chocolate-milk/', serving:'100 مل', cal:60, prot:8.5, protStr:'8.5 جم', cat:'protein-milk' },
+    { id:69, name:'حليب بروتين بالتمر', url:'https://nada.com.sa/en/product/protein-dates-milk/', serving:'100 مل', cal:60, prot:8.5, protStr:'8.5 جم', cat:'protein-milk' },
+    { id:70, name:'حليب بروتين بالفراولة مع الفواكه المشكلة', url:'https://nada.com.sa/en/product/protein-strawberry-mixed-fruits/', serving:'100 مل', cal:60, prot:8.0, protStr:'8.0 جم', cat:'protein-milk' },
+    { id:71, name:'حليب البروتين بالفانيلا مع الفواكه المشكلة', url:'https://nada.com.sa/en/product/protein-vanilla-mixed-fruits/', serving:'100 مل', cal:60, prot:8.0, protStr:'8.0 جم', cat:'protein-milk' },
+    { id:72, name:'معجون طماطم', url:'https://nada.com.sa/en/product/tomato-paste/', serving:'100 مل', cal:60, prot:4.0, protStr:'4.0 جم', cat:'other' },
+    { id:73, name:'حليب طويل الأجل كامل الدسم', url:'https://nada.com.sa/en/product/long-life-milk-full-cream/', serving:'100 مل', cal:59, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:74, name:'عصير أناناس عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-pineapple-floridas-natural-juice/', serving:'100 مل', cal:57, prot:0.6, protStr:'0.6 جم', cat:'juice' },
+    { id:75, name:'عصير برتقال وأناناس عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-orange-pineapple-floridas-natural-juice/', serving:'100 مل', cal:54, prot:0.0, protStr:'0.0 جم', cat:'juice' },
+    { id:76, name:'مشروب بروتين بالفانيلا العضوي', url:'https://nada.com.sa/en/product/high-protein-vanilla-1l/', serving:'100 مل', cal:50, prot:5.2, protStr:'5.2 جم', cat:'protein-milk' },
+    { id:77, name:'حليب خالي من اللاكتوز قليل الدسم', url:'https://nada.com.sa/en/product/lacto-free-milk-low-fat/', serving:'100 مل', cal:48, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:78, name:'عصير الأناناس طويل الأجل', url:'https://nada.com.sa/en/product/long-life-pineapple-juice/', serving:'100 مل', cal:48, prot:3.1, protStr:'3.1 جم', cat:'juice' },
+    { id:79, name:'نكتار كوكتيل البرتقال طويل الأجل', url:'https://nada.com.sa/en/product/long-life-orange-cocktail-nectar/', serving:'100 مل', cal:48, prot:3.1, protStr:'3.1 جم', cat:'juice' },
+    { id:80, name:'عصير التفاح طويل الأجل', url:'https://nada.com.sa/en/product/long-life-apple-juice/', serving:'100 مل', cal:48, prot:3.1, protStr:'3.1 جم', cat:'juice' },
+    { id:81, name:'حليب طويل الأجل خالي من اللاكتوز كامل الدسم', url:'https://nada.com.sa/en/product/long-life-milk-lacto-free-full-cream/', serving:'100 مل', cal:48, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:82, name:'عصير برتقال باللب عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-orange-most-pulp-floridas-natural-juice/', serving:'100 مل', cal:48, prot:0.0, protStr:'0.0 جم', cat:'juice' },
+    { id:83, name:'مشروب الشوفان العضوي', url:'https://nada.com.sa/en/product/organic-oat-drink/', serving:'100 مل', cal:47, prot:0.5, protStr:'0.5 جم', cat:'plant-based' },
+    { id:84, name:'عصير ليمون عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-lemonade-floridas-natural-juice/', serving:'100 مل', cal:46, prot:0.0, protStr:'0.0 جم', cat:'juice' },
+    { id:85, name:'مشروب جوز الهند العضوي', url:'https://nada.com.sa/en/product/coconut-drink/', serving:'100 مل', cal:45, prot:0.5, protStr:'0.5 جم', cat:'plant-based' },
+    { id:86, name:'زبادي طازج قليل الدسم', url:'https://nada.com.sa/en/product/fresh-yoghurt-low-fat/', serving:'100 مل', cal:45, prot:3.1, protStr:'3.1 جم', cat:'yogurt' },
+    { id:87, name:'مشروب البروتين العضوي سادة', url:'https://nada.com.sa/en/product/high-protein-plain/', serving:'100 مل', cal:43, prot:5.0, protStr:'5.0 جم', cat:'protein-milk' },
+    { id:88, name:'حليب طازج قليل الدسم', url:'https://nada.com.sa/en/product/fresh-milk-low-fat/', serving:'100 مل', cal:41, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:89, name:'لبن طازج قليل الدسم', url:'https://nada.com.sa/en/product/fresh-laban-low-fat/', serving:'100 مل', cal:41, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:90, name:'حليب طويل الأجل قليل الدسم', url:'https://nada.com.sa/en/product/long-life-milk-low-fat/', serving:'100 مل', cal:41, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:91, name:'عصير جريب فروت عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-grapefruit-floridas-natural-juice/', serving:'100 مل', cal:38, prot:0.0, protStr:'0.0 جم', cat:'juice' },
+    { id:92, name:'مشروب اللوز العضوي', url:'https://nada.com.sa/en/product/organic-almond-drink/', serving:'100 مل', cal:34, prot:0.8, protStr:'0.8 جم', cat:'plant-based' },
+    { id:93, name:'حليب طازج منزوع الدسم', url:'https://nada.com.sa/en/product/fresh-milk-skimmed/', serving:'100 مل', cal:31, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:94, name:'حليب طويل الأجل منزوع الدسم', url:'https://nada.com.sa/en/product/long-life-skimmed-milk/', serving:'100 مل', cal:31, prot:3.1, protStr:'3.1 جم', cat:'milk' },
+    { id:95, name:'عيران – شراب اللبن الطازج', url:'https://nada.com.sa/en/product/aryan-fresh-laban-drink/', serving:'100 مل', cal:29, prot:2.0, protStr:'2.0 جم', cat:'milk' },
+    { id:96, name:'عصير برتقال بدون اللب عالي الجودة فلوريدا ناتشورال', url:'https://nada.com.sa/en/product/premium-orange-no-pulp-floridas-natural-juice/', serving:'—', cal:null, prot:1.0, protStr:'1.0 جم', cat:'juice' },
+  ];
+
+  const MAX_CAL = 213;
+
+  let activeCat = 'all';
+  let activeCal = 'all';
+  let sortMode  = 'cal-desc';
+  let searchQ   = '';
+
+  function calTier(cal) {
+    if (cal === null) return 'none';
+    if (cal >= 150) return 'high';
+    if (cal >= 70)  return 'mid';
+    return 'low';
+  }
+
+  function buildCard(p) {
+    const tier   = calTier(p.cal);
+    const pct    = p.cal !== null ? Math.round((p.cal / MAX_CAL) * 100) : 0;
+    const calDisplay = p.cal !== null
+      ? `<span class="cal-value ${tier}">${Math.round(p.cal)}</span><span class="cal-unit">سعرة حرارية</span>`
+      : `<span class="cal-value none">غير محدد</span>`;
+
+    return `<article class="card">
+      <div class="card-top">
+        <h2 class="card-name"><a href="${p.url}" target="_blank" rel="noopener">${p.name}</a></h2>
+        <span class="cat-badge cat-${p.cat}">${CAT_LABELS[p.cat]}</span>
+      </div>
+      <div class="cal-section">
+        <div class="cal-row">${calDisplay}</div>
+        <div class="bar-track"><div class="bar-fill ${tier}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="meta-row">
+        <span class="meta-chip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-9 13-9 13S3 15.97 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
+          <strong>${p.serving}</strong>
+        </span>
+        <span class="meta-chip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          بروتين: <strong>${p.protStr}</strong>
+        </span>
+      </div>
+    </article>`;
+  }
+
+  function getFiltered() {
+    let list = [...products];
+
+    if (activeCat !== 'all') list = list.filter(p => p.cat === activeCat);
+
+    if (activeCal === 'low')  list = list.filter(p => p.cal !== null && p.cal < 70);
+    if (activeCal === 'mid')  list = list.filter(p => p.cal !== null && p.cal >= 70 && p.cal <= 120);
+    if (activeCal === 'high') list = list.filter(p => p.cal !== null && p.cal > 120);
+
+    if (searchQ) {
+      const q = searchQ;
+      list = list.filter(p => p.name.includes(q));
+    }
+
+    if (sortMode === 'cal-desc')  list.sort((a, b) => (b.cal ?? -1) - (a.cal ?? -1));
+    if (sortMode === 'cal-asc')   list.sort((a, b) => (a.cal ?? 999) - (b.cal ?? 999));
+    if (sortMode === 'prot-desc') list.sort((a, b) => (b.prot ?? -1) - (a.prot ?? -1));
+    if (sortMode === 'name')      list.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+
+    return list;
+  }
+
+  function render() {
+    const filtered = getFiltered();
+    const grid = document.getElementById('grid');
+    document.getElementById('results-count').textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6m-3-3v6"/>
+        </svg>
+        <h2>لا توجد نتائج</h2>
+        <p>جرّب تغيير الفلتر أو مصطلح البحث</p>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(buildCard).join('');
+  }
+
+  // Category pills
+  document.querySelectorAll('[data-cat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat;
+      render();
+    });
+  });
+
+  // Calorie range pills
+  document.querySelectorAll('[data-cal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-cal]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCal = btn.dataset.cal;
+      render();
+    });
+  });
+
+  // Sort
+  document.getElementById('sort-select').addEventListener('change', e => {
+    sortMode = e.target.value;
+    render();
+  });
+
+  // Search
+  document.getElementById('search-input').addEventListener('input', e => {
+    searchQ = e.target.value.trim();
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
