@@ -13,19 +13,15 @@
       --green:      #00833D;
       --green-dark: #005C2B;
       --green-mid:  #00A34C;
-      --green-pale: #E6F4ED;
-      --green-chip: #C8E9D7;
-      --amber:      #D97706;
-      --amber-pale: #FEF3C7;
-      --red:        #DC2626;
-      --red-pale:   #FEE2E2;
-      --bg:         #F4F8F6;
+      --green-light:#E8F5ED;
+      --amber:      #C96800;
+      --red:        #C8200A;
+      --bg:         #F0F2F1;
       --surface:    #FFFFFF;
-      --border:     #D6E8DC;
-      --text:       #142B1E;
-      --muted:      #5A7A68;
-      --radius:     12px;
-      --shadow:     0 1px 3px rgba(0,80,40,.07), 0 4px 12px rgba(0,80,40,.05);
+      --border:     #DEE4E0;
+      --text:       #111B15;
+      --muted:      #687D71;
+      --radius:     14px;
     }
 
     html { scroll-behavior: smooth; }
@@ -35,58 +31,53 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100dvh;
-      line-height: 1.6;
     }
 
     /* ── Header ── */
-    .header {
-      background: var(--green);
-      color: #fff;
+    .header { background: var(--green); }
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
       padding: 28px 24px 24px;
-      text-align: center;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
     }
-    .header-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .header-logo svg { flex-shrink: 0; }
-    .header h1 {
-      font-size: clamp(22px, 5vw, 32px);
+    .header-brand h1 {
+      font-size: clamp(20px, 4vw, 28px);
       font-weight: 800;
       letter-spacing: -0.02em;
       color: #fff;
+      line-height: 1.2;
+      margin-bottom: 5px;
     }
-    .header p {
-      font-size: 14px;
-      color: rgba(255,255,255,.75);
-      margin-top: 4px;
+    .header-brand p { font-size: 13px; color: rgba(255,255,255,.7); }
+    .header-stats { display: flex; gap: 10px; flex-shrink: 0; }
+    .stat-box {
+      text-align: center;
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 10px;
+      padding: 10px 16px;
+      min-width: 72px;
     }
-    .header-stats {
-      display: inline-flex;
-      gap: 24px;
-      margin-top: 16px;
-      background: rgba(255,255,255,.12);
-      border-radius: 40px;
-      padding: 8px 20px;
-      font-size: 13px;
+    .stat-box strong {
+      display: block;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 3px;
     }
-    .header-stats span { color: rgba(255,255,255,.9); }
-    .header-stats strong { color: #fff; font-weight: 700; }
+    .stat-box span { font-size: 11px; color: rgba(255,255,255,.7); font-weight: 500; }
 
     /* ── Controls ── */
-    .controls {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 20px 20px 0;
-    }
+    .controls { max-width: 1280px; margin: 0 auto; padding: 18px 20px 0; }
 
-    .search-bar {
-      position: relative;
-      margin-bottom: 14px;
-    }
-    .search-bar input {
+    .search-wrap { position: relative; margin-bottom: 12px; }
+    .search-wrap input {
       width: 100%;
       padding: 11px 16px 11px 44px;
       border: 1.5px solid var(--border);
@@ -99,32 +90,44 @@
       transition: border-color .18s;
       direction: rtl;
     }
-    .search-bar input:focus { border-color: var(--green); }
-    .search-bar input::placeholder { color: var(--muted); }
+    .search-wrap input:focus { border-color: var(--green); }
+    .search-wrap input::placeholder { color: var(--muted); }
     .search-icon {
       position: absolute;
-      left: 14px;
-      top: 50%;
+      left: 14px; top: 50%;
       transform: translateY(-50%);
       color: var(--muted);
       pointer-events: none;
     }
 
-    .filter-row {
+    /* Scrollable category row */
+    .filter-scroll-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-bottom: 10px;
+    }
+    .filter-scroll-wrap::-webkit-scrollbar { display: none; }
+    .filter-scroll { display: flex; gap: 6px; width: max-content; padding-bottom: 2px; }
+
+    /* Second row: calorie + sort */
+    .filter-row2 {
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       gap: 8px;
       margin-bottom: 12px;
-      align-items: center;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
-    .filter-label {
-      font-size: 12px;
+    .filter-row2::-webkit-scrollbar { display: none; }
+    .filter-section-label {
+      font-size: 11.5px;
       font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-left: 4px;
+      letter-spacing: .07em;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .pill {
@@ -140,14 +143,10 @@
       transition: all .15s;
       white-space: nowrap;
       user-select: none;
+      flex-shrink: 0;
     }
     .pill:hover { border-color: var(--green); color: var(--green); }
-    .pill.active {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff;
-      font-weight: 600;
-    }
+    .pill.active { background: var(--green); border-color: var(--green); color: #fff; font-weight: 600; }
 
     .sort-select {
       padding: 7px 14px;
@@ -161,6 +160,7 @@
       outline: none;
       transition: border-color .15s;
       margin-right: auto;
+      flex-shrink: 0;
     }
     .sort-select:focus { border-color: var(--green); }
 
@@ -168,9 +168,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 0 14px;
+      padding: 8px 0 14px;
       font-size: 13px;
       color: var(--muted);
+      border-top: 1px solid var(--border);
     }
     .results-bar strong { color: var(--text); font-weight: 600; }
 
@@ -178,173 +179,152 @@
     .grid {
       max-width: 1280px;
       margin: 0 auto;
-      padding: 0 20px 48px;
+      padding: 0 20px 56px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
     }
 
+    /* ── Card ── */
     .card {
       background: var(--surface);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
       border: 1px solid var(--border);
-      padding: 18px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      transition: transform .15s, box-shadow .15s;
+      transition: box-shadow .2s, transform .2s;
     }
     .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0,80,40,.10), 0 1px 4px rgba(0,80,40,.06);
+      box-shadow: 0 8px 28px rgba(0,0,0,.09), 0 2px 8px rgba(0,0,0,.05);
+      transform: translateY(-3px);
     }
 
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .card-name {
-      font-size: 14.5px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.45;
-      flex: 1;
-    }
-    .card-name a {
-      color: inherit;
-      text-decoration: none;
-      transition: color .15s;
-    }
-    .card-name a:hover { color: var(--green); }
-
-    .cat-badge {
-      flex-shrink: 0;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 9px;
-      border-radius: 20px;
-      white-space: nowrap;
-    }
-
-    /* Category color coding */
-    .cat-labneh       { background: #E0F0EA; color: #175E35; }
-    .cat-greek-yogurt { background: #D6EAF8; color: #1A4E7A; }
-    .cat-drinking-yogurt { background: #D5EEF9; color: #1B5778; }
-    .cat-yogurt       { background: #E3F2FD; color: #1565C0; }
-    .cat-legumes      { background: #FFF3CD; color: #7D5A00; }
-    .cat-juice        { background: #FDE8D8; color: #7A2D0B; }
-    .cat-milk         { background: #F3E8FF; color: #5B21B6; }
-    .cat-protein-milk { background: #FCE7F3; color: #831843; }
-    .cat-plant-based  { background: #ECFDF5; color: #064E3B; }
-    .cat-other        { background: #F1F5F9; color: #475569; }
-
-    /* ── Calorie bar ── */
-    .cal-section { display: flex; flex-direction: column; gap: 6px; }
-
-    .cal-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .cal-label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
-    .cal-value {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1;
-    }
-    .cal-value.high  { color: var(--red); }
-    .cal-value.mid   { color: var(--amber); }
-    .cal-value.low   { color: var(--green); }
-    .cal-value.none  { font-size: 14px; color: var(--muted); }
-    .cal-unit { font-size: 12px; font-weight: 500; color: var(--muted); }
-
-    .bar-track {
-      height: 6px;
-      background: var(--bg);
-      border-radius: 99px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width .4s cubic-bezier(.4,0,.2,1);
-    }
-    .bar-fill.high  { background: linear-gradient(90deg, var(--amber), var(--red)); }
-    .bar-fill.mid   { background: linear-gradient(90deg, var(--green-mid), var(--amber)); }
-    .bar-fill.low   { background: var(--green); }
-
-    /* ── Product image ── */
+    /* Image */
     .card-img {
-      margin: -18px -18px 0;
-      border-radius: 11px 11px 0 0;
-      overflow: hidden;
-      background: var(--bg);
-      aspect-ratio: 1 / 1;
-      max-height: 180px;
+      aspect-ratio: 4 / 3;
+      background: #F7F9F8;
       border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      flex-shrink: 0;
     }
     .card-img img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: 14px;
-      transition: transform .25s;
+      padding: 16px;
+      transition: transform .3s ease;
     }
-    .card:hover .card-img img { transform: scale(1.04); }
+    .card:hover .card-img img { transform: scale(1.06); }
 
-    /* ── Meta row ── */
-    .meta-row {
+    /* Body */
+    .card-body {
+      padding: 14px 16px 16px;
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      border-top: 1px solid var(--green-pale);
-      padding-top: 10px;
+      flex-direction: column;
+      gap: 9px;
+      flex: 1;
     }
-    .meta-chip {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12px;
-      color: var(--muted);
-      background: var(--bg);
+
+    /* Category badge */
+    .cat-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
       border-radius: 20px;
-      padding: 4px 10px;
+      white-space: nowrap;
+      align-self: flex-start;
     }
-    .meta-chip strong { color: var(--text); font-weight: 600; }
-    .meta-chip svg { flex-shrink: 0; }
+    .cat-labneh          { background: #E0F0EA; color: #175E35; }
+    .cat-greek-yogurt    { background: #DDEEFB; color: #1A4E7A; }
+    .cat-drinking-yogurt { background: #D9ECFB; color: #1B5778; }
+    .cat-yogurt          { background: #E2F0FD; color: #1565C0; }
+    .cat-legumes         { background: #FEF3C7; color: #78520A; }
+    .cat-juice           { background: #FDE8D8; color: #7A2D0B; }
+    .cat-milk            { background: #F3E8FF; color: #5B21B6; }
+    .cat-protein-milk    { background: #FCE7F3; color: #831843; }
+    .cat-plant-based     { background: #ECFDF5; color: #064E3B; }
+    .cat-other           { background: #F1F5F9; color: #475569; }
 
-    /* ── Product link CTA ── */
-    .card-link {
+    /* Name */
+    .card-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Calorie block */
+    .cal-block { display: flex; flex-direction: column; gap: 6px; }
+    .cal-top { display: flex; align-items: baseline; gap: 7px; }
+    .cal-num {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+    .cal-num.high { color: var(--red); }
+    .cal-num.mid  { color: var(--amber); }
+    .cal-num.low  { color: var(--green); }
+    .cal-num.none { font-size: 15px; color: var(--muted); font-weight: 600; }
+    .cal-lbl { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .bar-track {
+      height: 5px;
+      background: var(--bg);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .5s cubic-bezier(.4,0,.2,1);
+    }
+    .bar-fill.high { background: linear-gradient(to left, var(--red), var(--amber)); }
+    .bar-fill.mid  { background: linear-gradient(to left, var(--amber), var(--green-mid)); }
+    .bar-fill.low  { background: var(--green); }
+    .bar-fill.none { background: var(--border); }
+
+    /* Card footer: meta + CTA */
+    .card-foot {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-top: 2px;
-      padding: 9px 13px;
-      border-radius: 8px;
-      background: var(--green-pale);
-      color: var(--green-dark);
-      font-size: 13px;
-      font-weight: 600;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      margin-top: auto;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .card-meta strong { color: var(--text); font-weight: 600; }
+    .sep { opacity: .4; }
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--green);
       text-decoration: none;
-      border: 1px solid var(--green-chip);
-      transition: background .15s, border-color .15s, color .15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color .15s, gap .15s;
     }
-    .card-link:hover {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff;
-    }
-    .card-link:hover svg { stroke: #fff; }
-    .card-link svg { transition: stroke .15s; flex-shrink: 0; }
-    .card-link-text { display: flex; align-items: center; gap: 6px; }
+    .card-cta:hover { color: var(--green-dark); gap: 7px; }
+    .card-cta svg { transition: transform .15s; }
+    .card-cta:hover svg { transform: translateX(-2px); }
 
     /* ── Empty state ── */
     .empty {
@@ -353,7 +333,7 @@
       padding: 64px 20px;
       color: var(--muted);
     }
-    .empty svg { display: block; margin: 0 auto 16px; opacity: .35; }
+    .empty svg { display: block; margin: 0 auto 16px; opacity: .3; }
     .empty h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
     .empty p { font-size: 14px; }
 
@@ -370,12 +350,16 @@
     footer a { color: var(--green); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
 
-    @media (max-width: 640px) {
-      .header { padding: 22px 16px 18px; }
-      .header-stats { gap: 16px; font-size: 12px; }
+    @media (max-width: 768px) {
+      .header-stats { display: none; }
+      .header-inner { padding: 20px 16px 18px; }
       .controls { padding: 14px 14px 0; }
-      .grid { padding: 0 14px 40px; gap: 10px; }
-      .sort-select { margin-right: 0; width: 100%; }
+      .grid { padding: 0 14px 40px; gap: 12px; }
+    }
+    @media (max-width: 480px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .card-body { padding: 10px 12px 12px; gap: 7px; }
+      .cal-num { font-size: 26px; }
     }
   </style>
 </head>
@@ -383,47 +367,45 @@
 
 <!-- Header -->
 <header class="header">
-  <div class="header-logo">
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-      <rect width="36" height="36" rx="10" fill="rgba(255,255,255,.15)"/>
-      <path d="M10 26V14l8-4 8 4v12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M14 26v-7h8v7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <h1>سعرات منتجات ندى</h1>
-  </div>
-  <p>السعرات الحرارية والبروتين لكل منتج — مرتبة ومصفاة</p>
-  <div class="header-stats">
-    <span><strong id="stat-total">96</strong> منتج</span>
-    <span><strong id="stat-max">213</strong> أعلى سعر</span>
-    <span><strong id="stat-min">29</strong> أقل سعر</span>
+  <div class="header-inner">
+    <div class="header-brand">
+      <h1>سعرات منتجات ندى</h1>
+      <p>مرجع السعرات الحرارية والبروتين لمنتجات ندى الغذائية</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-box"><strong id="stat-total">96</strong><span>منتج</span></div>
+      <div class="stat-box"><strong>213</strong><span>أعلى سعرة</span></div>
+      <div class="stat-box"><strong>29</strong><span>أقل سعرة</span></div>
+    </div>
   </div>
 </header>
 
 <!-- Controls -->
 <section class="controls">
-  <div class="search-bar">
+  <div class="search-wrap">
     <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
     </svg>
     <input type="search" id="search-input" placeholder="ابحث باسم المنتج..." autocomplete="off" />
   </div>
 
-  <div class="filter-row">
-    <span class="filter-label">الفئة</span>
-    <button class="pill active" data-cat="all">الكل</button>
-    <button class="pill" data-cat="labneh">لبنة وقشطة</button>
-    <button class="pill" data-cat="greek-yogurt">زبادي يوناني</button>
-    <button class="pill" data-cat="drinking-yogurt">شراب زبادي</button>
-    <button class="pill" data-cat="yogurt">زبادي طازج</button>
-    <button class="pill" data-cat="legumes">بقوليات</button>
-    <button class="pill" data-cat="juice">عصائر</button>
-    <button class="pill" data-cat="milk">حليب ولبن</button>
-    <button class="pill" data-cat="protein-milk">بروتين وباور ميلك</button>
-    <button class="pill" data-cat="plant-based">نباتية</button>
+  <div class="filter-scroll-wrap">
+    <div class="filter-scroll">
+      <button class="pill active" data-cat="all">الكل</button>
+      <button class="pill" data-cat="labneh">لبنة وقشطة</button>
+      <button class="pill" data-cat="greek-yogurt">زبادي يوناني</button>
+      <button class="pill" data-cat="drinking-yogurt">شراب زبادي</button>
+      <button class="pill" data-cat="yogurt">زبادي طازج</button>
+      <button class="pill" data-cat="legumes">بقوليات</button>
+      <button class="pill" data-cat="juice">عصائر</button>
+      <button class="pill" data-cat="milk">حليب ولبن</button>
+      <button class="pill" data-cat="protein-milk">بروتين وباور ميلك</button>
+      <button class="pill" data-cat="plant-based">نباتية</button>
+    </div>
   </div>
 
-  <div class="filter-row">
-    <span class="filter-label">السعرات</span>
+  <div class="filter-row2">
+    <span class="filter-section-label">سعرات</span>
     <button class="pill active" data-cal="all">الكل</button>
     <button class="pill" data-cal="low">أقل من 70</button>
     <button class="pill" data-cal="mid">70 – 120</button>
@@ -577,11 +559,11 @@
   }
 
   function buildCard(p) {
-    const tier   = calTier(p.cal);
-    const pct    = p.cal !== null ? Math.round((p.cal / MAX_CAL) * 100) : 0;
+    const tier = calTier(p.cal);
+    const pct  = p.cal !== null ? Math.round((p.cal / MAX_CAL) * 100) : 0;
     const calDisplay = p.cal !== null
-      ? `<span class="cal-value ${tier}">${Math.round(p.cal)}</span><span class="cal-unit">سعرة حرارية</span>`
-      : `<span class="cal-value none">غير محدد</span>`;
+      ? `<span class="cal-num ${tier}">${Math.round(p.cal)}</span><span class="cal-lbl">سعرة حرارية</span>`
+      : `<span class="cal-num none">غير محدد</span>`;
 
     const imgBlock = p.img
       ? `<div class="card-img"><img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.closest('.card-img').style.display='none'"></div>`
@@ -589,31 +571,25 @@
 
     return `<article class="card">
       ${imgBlock}
-      <div class="card-top">
-        <h2 class="card-name">${p.name}</h2>
+      <div class="card-body">
         <span class="cat-badge cat-${p.cat}">${CAT_LABELS[p.cat]}</span>
+        <h2 class="card-name">${p.name}</h2>
+        <div class="cal-block">
+          <div class="cal-top">${calDisplay}</div>
+          <div class="bar-track"><div class="bar-fill ${tier}" style="width:${pct}%"></div></div>
+        </div>
+        <div class="card-foot">
+          <div class="card-meta">
+            <span>بروتين <strong>${p.protStr}</strong></span>
+            <span class="sep">·</span>
+            <span>${p.serving}</span>
+          </div>
+          <a href="${p.url}" target="_blank" rel="noopener" class="card-cta" aria-label="عرض صفحة ${p.name} على موقع ندى">
+            عرض
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
       </div>
-      <div class="cal-section">
-        <div class="cal-row">${calDisplay}</div>
-        <div class="bar-track"><div class="bar-fill ${tier}" style="width:${pct}%"></div></div>
-      </div>
-      <div class="meta-row">
-        <span class="meta-chip">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-9 13-9 13S3 15.97 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
-          <strong>${p.serving}</strong>
-        </span>
-        <span class="meta-chip">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          بروتين: <strong>${p.protStr}</strong>
-        </span>
-      </div>
-      <a href="${p.url}" target="_blank" rel="noopener" class="card-link" aria-label="عرض صفحة ${p.name} على موقع ندى">
-        <span class="card-link-text">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6"/><path d="M9 15 15 9"/></svg>
-          عرض المنتج على ندى
-        </span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
     </article>`;
   }
 
