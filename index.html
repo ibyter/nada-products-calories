@@ -133,7 +133,36 @@
       scrollbar-width: none;
     }
     .cal-scroll-wrap::-webkit-scrollbar { display: none; }
-    .cal-scroll { display: flex; gap: 6px; width: max-content; padding-bottom: 2px; }
+    .cal-scroll { display: flex; gap: 6px; width: max-content; padding-bottom: 2px; align-items: center; }
+
+    /* Custom calorie input */
+    .cal-custom-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      padding: 5px 13px;
+      background: var(--surface);
+      transition: border-color .15s;
+      flex-shrink: 0;
+    }
+    .cal-custom-wrap:focus-within { border-color: var(--green); }
+    .cal-custom-wrap.active { border-color: var(--green); background: var(--green-light); }
+    .cal-custom-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      width: 58px;
+      text-align: right;
+      direction: ltr;
+    }
+    .cal-custom-input::placeholder { color: var(--muted); font-weight: 400; }
+    .cal-custom-unit { font-size: 12px; color: var(--muted); white-space: nowrap; }
 
     .pill {
       padding: 6px 14px;
@@ -414,10 +443,14 @@
     <span class="filter-section-label">سعرات</span>
     <div class="cal-scroll-wrap">
       <div class="cal-scroll">
-        <button class="pill active" data-cal="all">الكل</button>
-        <button class="pill" data-cal="low">أقل من 70</button>
-        <button class="pill" data-cal="mid">70 – 120</button>
-        <button class="pill" data-cal="high">أكثر من 120</button>
+        <button class="pill active" data-cal="0">الكل</button>
+        <button class="pill" data-cal="50">≤ 50</button>
+        <button class="pill" data-cal="100">≤ 100</button>
+        <button class="pill" data-cal="150">≤ 150</button>
+        <div class="cal-custom-wrap" id="cal-custom-wrap">
+          <input type="number" id="cal-custom" class="cal-custom-input" placeholder="حد أقصى" min="1" max="500" />
+          <span class="cal-custom-unit">سعرة</span>
+        </div>
       </div>
     </div>
   </div>
@@ -556,7 +589,7 @@
   const MAX_CAL = 213;
 
   let activeCat = 'all';
-  let activeCal = 'all';
+  let calMax    = null; // null = no limit
   let sortMode  = 'cal-desc';
   let searchQ   = '';
 
@@ -607,9 +640,7 @@
 
     if (activeCat !== 'all') list = list.filter(p => p.cat === activeCat);
 
-    if (activeCal === 'low')  list = list.filter(p => p.cal !== null && p.cal < 70);
-    if (activeCal === 'mid')  list = list.filter(p => p.cal !== null && p.cal >= 70 && p.cal <= 120);
-    if (activeCal === 'high') list = list.filter(p => p.cal !== null && p.cal > 120);
+    if (calMax !== null) list = list.filter(p => p.cal !== null && p.cal <= calMax);
 
     if (searchQ) {
       const q = searchQ;
@@ -653,14 +684,34 @@
     });
   });
 
-  // Calorie range pills
+  // Calorie max chips
   document.querySelectorAll('[data-cal]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-cal]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      activeCal = btn.dataset.cal;
+      const v = parseInt(btn.dataset.cal);
+      calMax = v === 0 ? null : v;
+      const inp = document.getElementById('cal-custom');
+      inp.value = '';
+      document.getElementById('cal-custom-wrap').classList.remove('active');
       render();
     });
+  });
+
+  // Custom calorie input
+  document.getElementById('cal-custom').addEventListener('input', e => {
+    const v = parseInt(e.target.value);
+    const wrap = document.getElementById('cal-custom-wrap');
+    if (!isNaN(v) && v > 0) {
+      calMax = v;
+      document.querySelectorAll('[data-cal]').forEach(b => b.classList.remove('active'));
+      wrap.classList.add('active');
+    } else {
+      calMax = null;
+      document.querySelector('[data-cal="0"]').classList.add('active');
+      wrap.classList.remove('active');
+    }
+    render();
   });
 
   // Sort
